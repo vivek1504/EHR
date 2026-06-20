@@ -12,3 +12,162 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  ADMIN
+  ANNOTATOR
+  REVIEWER
+  VIEWER
+}
+
+enum DocumentStatus {
+  UPLOADED
+  QUEUED
+  PROCESSING
+  READY_FOR_REVIEW
+  FAILED
+}
+
+enum AnnotationSource {
+  HUMAN
+  LLM
+}
+
+enum AnnotationStatus {
+  SUGGESTED
+  ACCEPTED
+  REJECTED
+  CORRECTED
+}
+
+enum MedicalEntityLabel {
+  CLINICAL_CONDITION
+  MEDICATION_STATEMENT
+  CLINICAL_FINDING
+  MEDICAL_PROCEDURE
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum AuditAction {
+  DOCUMENT_UPLOADED
+  DOCUMENT_DELETED
+  ANALYSIS_TRIGGERED
+  ANALYSIS_COMPLETED
+  ANALYSIS_FAILED
+  ANNOTATION_CREATED
+  ANNOTATION_UPDATED
+  ANNOTATION_DELETED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  role      Role     @default(ANNOTATOR)
+  apiKey    String   @unique @default(uuid())
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  documents   Document[]
+  annotations Annotation[]
+  auditLogs   AuditLog[]
+
+  @@index([email])
+  @@index([apiKey])
+}
+
+model Document {
+  id           String         @id @default(uuid())
+  title        String
+  category     String?
+  storageKey   String
+  status       DocumentStatus @default(UPLOADED)
+  textHash     String?
+  wordCount    Int?
+  uploadedById String?
+  uploadedBy   User?          @relation(fields: [uploadedById], references: [id])
+  deletedAt    DateTime?
+
+  annotations Annotation[]
+  jobs        ProcessingJob[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([uploadedById])
+  @@index([deletedAt])
+  @@index([category])
+}
+
+model Annotation {
+  id          String             @id @default(uuid())
+  documentId  String
+  document    Document           @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  text        String
+  label       MedicalEntityLabel
+  startOffset Int
+  endOffset   Int
+  source      AnnotationSource
+  status      AnnotationStatus   @default(SUGGESTED)
+  confidence  Float?
+
+  createdById String?
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([documentId])
+  @@index([documentId, source])
+  @@index([status])
+  @@index([label])
+}
+
+model ProcessingJob {
+  id          String    @id @default(uuid())
+  documentId  String
+  document    Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  status      JobStatus @default(PENDING)
+  taskId      String?
+  attempt     Int       @default(1)
+  error       String?
+  entityCount Int?
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([documentId])
+  @@index([status])
+  @@index([taskId])
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  action     AuditAction
+  entityType String
+  entityId   String
+  userId     String?
+  user       User?       @relation(fields: [userId], references: [id])
+  metadata   Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model SystemFlag {
+  key       String   @id
+  value     Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+}
