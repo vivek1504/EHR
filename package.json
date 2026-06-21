@@ -1,15 +1,24 @@
 {
-  "name": "health",
+  "name": "ehr-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "EHR Annotation Platform Backend — Cloud-native clinical NLP tool",
+  "main": "dist/server.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "lint": "tsc --noEmit",
+    "seed": "tsx src/scripts/seed.ts",
+    "cleanup": "tsx src/scripts/cleanup.ts",
+    "db:migrate": "npx prisma migrate dev",
+    "db:push": "npx prisma migrate deploy",
+    "db:studio": "npx prisma studio",
+    "db:generate": "npx prisma generate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "devDependencies": {
     "@types/node": "^26.0.0",
     "@types/pg": "^8.20.0",
@@ -19,8 +28,11 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@hono/node-server": "^1.13.8",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
-    "pg": "^8.22.0"
+    "hono": "^4.6.12",
+    "pg": "^8.22.0",
+    "zod": "^3.25.76"
   }
 }
