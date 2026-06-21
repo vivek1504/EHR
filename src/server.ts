@@ -19,6 +19,6 @@ serve(
       storage: config.GCS_EMULATOR ? "local" : "gcs",
     });
 
-    console.log("running");
+    console.log("EHR Backend → http://localhost:3000");
   },
 );

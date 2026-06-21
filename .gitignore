@@ -1,7 +1,7 @@
 node_modules
 .env
 /generated/prisma
-_original
+
 dist
 tsconfig.tsbuildinfo
 future.txt
