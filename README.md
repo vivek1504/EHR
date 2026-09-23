@@ -19,7 +19,7 @@ Built with **Hono** · **TypeScript** · **PostgreSQL** · **Prisma** · **Groq 
 
 ## Overview
 
-A production-grade REST API backend for an **Electronic Health Record (EHR) Annotation Platform** — a clinical NLP tool that:
+A REST API backend for an **Electronic Health Record (EHR) Annotation Platform** — an LLM-assisted annotation tool that:
 
 - **Ingests** raw clinical notes (discharge summaries, visit notes)
 - **Automatically extracts** medical entities using LLM inference (Groq / Llama-3.3-70b)
@@ -376,7 +376,6 @@ All state mutations (create, update, delete) are logged to the `AuditLog` table 
 - **Which entity** — entityType + entityId
 - **What changed** — JSON metadata with old/new values
 - **When** — timestamp
-- **Where** — IP address
 
 ---
 
@@ -389,7 +388,6 @@ All state mutations (create, update, delete) are logged to the `AuditLog` table 
 | `npm start` | Run production build |
 | `npm run lint` | Type check (`tsc --noEmit`) |
 | `npm run seed` | Seed database with users + clinical notes |
-| `npm run cleanup` | Delete all data from database + local storage |
 | `npm run db:migrate` | Create a new Prisma migration |
 | `npm run db:push` | Apply migrations to database |
 | `npm run db:studio` | Open Prisma Studio (visual DB browser) |
@@ -431,9 +429,9 @@ docker compose up
 | `NODE_ENV` | No | `development` | Environment |
 | `GROQ_API_KEY` | No | — | Groq API key for LLM analysis |
 | `AI_PROVIDER` | No | `groq` | AI provider (`groq` or `vertex`) |
-| `GCS_EMULATOR` | No | `true` | Use local filesystem instead of GCS |
+| `GCS_EMULATOR` | No | `true` | Use local filesystem (GCS upload is not yet implemented) |
 | `STORAGE_PATH` | No | `./data/documents` | Local file storage path |
-| `CLOUD_TASKS_ENABLED` | No | `false` | Enable async processing via Cloud Tasks |
+| `CLOUD_TASKS_ENABLED` | No | `false` | Roadmap flag — Cloud Tasks dispatch is not yet implemented; keep `false` |
 | `CORS_ORIGIN` | No | `*` | Allowed CORS origin |
 | `GCP_PROJECT_ID` | No | — | GCP project (production) |
 | `GCP_REGION` | No | `asia-south1` | GCP region (production) |

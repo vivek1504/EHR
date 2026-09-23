@@ -10,7 +10,6 @@
     "start": "node dist/server.js",
     "lint": "tsc --noEmit",
     "seed": "tsx src/scripts/seed.ts",
-    "cleanup": "tsx src/scripts/cleanup.ts",
     "db:migrate": "npx prisma migrate dev",
     "db:push": "npx prisma migrate deploy",
     "db:studio": "npx prisma studio",
